@@ -7,6 +7,7 @@ Node::Node() {
   left = NULL;
   right = NULL;
   parent = NULL;
+  black = false;
 }
 
 Node::Node(int nData) {
@@ -14,6 +15,7 @@ Node::Node(int nData) {
   left = NULL;
   right = NULL;
   parent = NULL;
+  black = false;
 }
 
 Node::Node(int nData, Node* nLeft, Node* nRight, Node* nParent) {
@@ -21,6 +23,7 @@ Node::Node(int nData, Node* nLeft, Node* nRight, Node* nParent) {
   left = nLeft;
   right = nRight;
   parent = nParent;
+  black = false;
 }
 
 Node::~Node() {
@@ -50,6 +53,19 @@ Node* Node::getGP() {
   }
 }
 
+Node* Node::getUncle() {
+  Node* gp = this->getGP();
+  if(gp != NULL) {
+    if(gp->getLeft() != parent) {
+      return gp->getLeft();
+    }
+    else {
+      return gp->getRight();
+    }
+  }
+  return NULL;
+}
+
 int Node::getData() {
   return data;
 }
@@ -76,16 +92,4 @@ bool Node::getColor() {
 
 void Node::setColor(bool color) {
   black = color;
-}
-
-Node* Node::getUncle() {
-  if(parent == NULL || parent->getParent() == NULL) {
-    return NULL;
-  }
-  if(parent->getParent()->getLeft() != parent) {
-    return parent->getParent()->getLeft();
-  }
-  else {
-    return parent->getParent()->getRight();
-  }
 }

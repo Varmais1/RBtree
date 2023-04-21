@@ -10,6 +10,7 @@ using namespace std;
 int main() {
   RBtree tree;
   char command[10];
+  int num;
   while(true) {
     cout << "Type in quit, add or print." << endl;
     cin >> command;
@@ -17,10 +18,17 @@ int main() {
     if(strcmp(command, "quit") == 0) {
       return 0;
     }
+    else if(strcmp(command, "add") == 0) {
+      cout << "Which number would you like to add?" << endl;
+      cin >> num;
+      Node* addition = new Node(num);
+      tree.add(addition, tree.getTop());
+    }
+    else if(strcmp(command, "print") == 0) {
+      tree.print(tree.getTop(),0);
+    }
+  
   }
-
-  
-  
 }
 
 

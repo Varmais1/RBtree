@@ -1,5 +1,8 @@
 #include "RBtree.h"
 
+void uncle(Node* current);
+
+
 using namespace std;
 
 RBtree::RBtree() {
@@ -57,4 +60,69 @@ void RBtree::print(Node* nTop, int depth) {
 
 Node* RBtree::getTop() {
   return top;
+}
+
+void RBtree::add(Node* toAdd, Node* current) {
+  if(top == NULL) {
+    top = toAdd;
+    toAdd->setColor(true);
+    return;
+  }
+  bool greater = toAdd->getData() > current->getData();
+  if(greater) {
+    if(current->getRight() == NULL) {
+      if(current->getColor()) {
+	current->setRight(toAdd);
+	toAdd->setParent(current);
+	return;
+      }
+      else {
+	current->setRight(toAdd);
+	toAdd->setParent(current);
+	if(!toAdd->getUncle()->getColor()) {
+	  uncle(toAdd);
+	  top->setColor(true);
+	}
+      }
+    }
+    else {
+      add(toAdd, current->getRight());
+    }
+  }
+  else {
+    if(current->getLeft() == NULL) {
+      if(current->getColor()) {
+	current->setLeft(toAdd);
+	toAdd->setParent(current);
+	return;
+      }
+      else {
+	current->setRight(toAdd);
+	toAdd->setParent(current);
+	if(!toAdd->getUncle()->getColor()) {
+	  uncle(toAdd);
+	  top->setColor(true);
+	}
+      }
+    }
+    else {
+      add(toAdd, current->getLeft());
+    }
+  }
+  
+}
+
+void uncle(Node* current) {
+  Node* nParent = current->getParent();
+  Node* nUncle = current->getUncle();
+  if(nParent != NULL) {
+    nParent->setColor(true);
+  }
+  else {
+    return;
+  }
+  if(nUncle != NULL) {
+    nUncle->setColor(true);
+  }
+  uncle(current->getGP());
 }
