@@ -41,7 +41,13 @@ void RBtree::print(Node* nTop, int depth) {
     cout << "\t";
   }
   //output the data
-  cout << nTop->getData() << endl;
+  cout << nTop->getData();
+  if(nTop->getColor()) {
+    cout << "B" << endl;
+  }
+  else {
+    cout << "R" << endl;
+  }
 
   //if the right isn't NULL, do this function for the right
   if(nTop->getRight() != NULL) {
