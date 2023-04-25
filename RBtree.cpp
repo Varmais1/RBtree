@@ -1,7 +1,8 @@
 #include "RBtree.h"
 
 void uncle(Node* current);
-
+void leftRT(Node* lower, Node* upper);
+void rightRT(Node* lower, Node* upper);
 
 using namespace std;
 
@@ -62,7 +63,7 @@ Node* RBtree::getTop() {
   return top;
 }
 
-void RBtree::add(Node* toAdd, Node* current) {
+/*void RBtree::add(Node* toAdd, Node* current) {
   if(top == NULL) {
     top = toAdd;
     toAdd->setColor(true);
@@ -110,6 +111,74 @@ void RBtree::add(Node* toAdd, Node* current) {
     }
   }
   
+}*/
+
+void RBtree::add(Node* toAdd, Node* current) {
+  if(top==NULL) {
+    top = toAdd;
+    toAdd->setColor(true);
+    return;
+  }
+  bool greater = toAdd->getData() >= current->getData();
+  bool black = current->getColor();
+  if(greater) {
+    if(current->getRight() == NULL) {
+      if(black) {
+	current->setRight(toAdd);
+	toAdd->setParent(current);
+	return;
+      }
+      else {
+	toAdd->setParent(current);
+	current->setRight(toAdd);
+	if(current->getColor() == false && toAdd->getUncle()->getColor() == false) {
+	  uncle(toAdd);
+	  if(!top->getColor()) {
+	    top->setColor(true);
+	  }
+	}
+	else if(current->getColor() == false && (toAdd->getUncle() == NULL || toAdd->getUncle()->getColor() == true) && current->getParent()->getRight() == current) {
+	  leftRT(current,current->getParent());
+	  current->getLeft()->setColor(false);
+	  current->setColor(true);
+	}
+	else if(current->getColor() == false && (toAdd->getUncle() == NULL || toAdd->getUncle()->getColor() == true) && current->getParent()->getLeft() == current) {
+	  rightRT(toAdd, current);
+	  leftRT(toAdd,toAdd->getParent());
+	  toAdd->getLeft()->setColor(false);
+	  toAdd->setColor(true);
+	}
+      }
+    }
+    else {
+      add(toAdd, current->getRight());
+    }
+  }
+  else {
+    if(current->getLeft() == NULL) {
+      if(black) {
+	current->setLeft(toAdd);
+	toAdd->setParent(current);
+	return;
+      }
+      else {
+	toAdd->setParent(current);
+	current->setLeft(toAdd);
+	if(current->getColor() == false && toAdd->getUncle()->getColor() == false) {
+	  uncle(toAdd);
+	  if(!top->getColor()) {
+	    top->setColor(true);
+	  }
+	}
+	if(current->getColor() == false && toAdd->getUncle()->getColor() == true) {
+	  
+	}
+      }
+    }
+    else {
+      add(toAdd, current->getLeft());
+    }
+  }
 }
 
 void uncle(Node* current) {
@@ -124,5 +193,23 @@ void uncle(Node* current) {
   if(nUncle != NULL) {
     nUncle->setColor(true);
   }
-  uncle(current->getGP());
+  if(current->getGP() != NULL) {
+    nParent->getParent()->setColor(false);
+    uncle(current->getGP());
+  }
+}
+
+
+void leftRT(Node* lower, Node* upper) {
+  lower->setParent(upper->getParent());
+  upper->setRight(lower->getLeft());
+  lower->setLeft(upper);
+  upper->setParent(lower);
+}
+
+void rightRT(Node* lower, Node* upper) {
+  lower->setParent(upper->getParent());
+  upper->setLeft(lower->getRight());
+  lower->setRight(upper);
+  upper->setParent(lower);
 }
