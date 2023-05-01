@@ -14,6 +14,8 @@ class RBtree {
   bool search();
   Node* getTop();
   Node* setTop();
+  void leftRT(Node* lower, Node* upper);
+  void rightRT(Node* lower, Node* upper);
  private:
   Node* top;
 };

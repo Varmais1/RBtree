@@ -1,8 +1,8 @@
 #include "RBtree.h"
 
 void uncle(Node* current);
-void leftRT(Node* lower, Node* upper);
-void rightRT(Node* lower, Node* upper);
+//void leftRT(Node* lower, Node* upper);
+//void rightRT(Node* lower, Node* upper);
 
 using namespace std;
 
@@ -200,16 +200,28 @@ void uncle(Node* current) {
 }
 
 
-void leftRT(Node* lower, Node* upper) {
+void RBtree::leftRT(Node* lower, Node* upper) {
   lower->setParent(upper->getParent());
+  if(upper == top) {
+    top = lower;
+  }
   upper->setRight(lower->getLeft());
+  if(upper->getRight() != NULL) {
+    upper->getRight()->setParent(upper);
+  }
   lower->setLeft(upper);
   upper->setParent(lower);
 }
 
-void rightRT(Node* lower, Node* upper) {
+void RBtree::rightRT(Node* lower, Node* upper) {
   lower->setParent(upper->getParent());
+  if(upper == top) {
+    top = lower;
+  }
   upper->setLeft(lower->getRight());
+  if(upper->getLeft() != NULL) {
+    upper->getRight()->setParent(upper);
+  }
   lower->setRight(upper);
   upper->setParent(lower);
 }
