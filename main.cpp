@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include "RBtree.h"
+#include <fstream>
 
 void singlelowercase(char sentence[]);
 
@@ -11,8 +12,9 @@ int main() {
   RBtree tree;
   char command[10];
   int num;
+  char fileName[100];
   while(true) {
-    cout << "Type in quit, add or print." << endl;
+    cout << "Type in quit, add or print, or file(for adding with a file)." << endl;
     cin >> command;
     singlelowercase(command);
     if(strcmp(command, "quit") == 0) {
@@ -26,6 +28,19 @@ int main() {
     }
     else if(strcmp(command, "print") == 0) {
       tree.print(tree.getTop(),0);
+    }
+    else if(strcmp(command, "file") == 0) {
+      cout << "Give the file name here: " << endl;
+      cin >> fileName;
+      ifstream finput(fileName);
+      if(!finput.good()) {
+	cout << "No file." << endl;
+	continue;
+      }
+      int add;
+      while(finput >> add) {
+	tree.add(new Node(add), tree.getTop());
+      }
     }
   
   }

@@ -121,57 +121,95 @@ void RBtree::add(Node* toAdd, Node* current) {
   }
   bool greater = toAdd->getData() >= current->getData();
   bool black = current->getColor();
+  //if greater
   if(greater) {
+    //if this is the place to insert
     if(current->getRight() == NULL) {
+      //if the parent is black
       if(black) {
+	//just add the node
 	current->setRight(toAdd);
 	toAdd->setParent(current);
 	return;
       }
+      //if the parent isn't black
       else {
+	//add the node
 	toAdd->setParent(current);
 	current->setRight(toAdd);
-	if(current->getColor() == false && toAdd->getUncle()->getColor() == false) {
+	//if both the parent and uncle are black, call the uncle function, and if the top is red, make the top black
+	if(current->getColor() == false && toAdd->getUncle() != NULL && toAdd->getUncle()->getColor() == false) {
 	  uncle(toAdd);
 	  if(!top->getColor()) {
 	    top->setColor(true);
 	  }
 	}
+	//if the parent is red and the uncle is black, and the parent is the right child of the grandparent (the added node is the right child of the parent)
 	else if(current->getColor() == false && (toAdd->getUncle() == NULL || toAdd->getUncle()->getColor() == true) && current->getParent()->getRight() == current) {
+	  //do a left rotation with the parent and grandparent
 	  leftRT(current,current->getParent());
+	  //recolor
 	  current->getLeft()->setColor(false);
 	  current->setColor(true);
 	}
+	//if the parent is red and the uncle is black, and the parent is the left child of the grandparent (the added node is the right child of the parent)
 	else if(current->getColor() == false && (toAdd->getUncle() == NULL || toAdd->getUncle()->getColor() == true) && current->getParent()->getLeft() == current) {
+	  //right rotate the added value and the parent, and do the same thing as the previous case
 	  rightRT(toAdd, current);
+	  //the added value is now the parent, to left rotate the added value
 	  leftRT(toAdd,toAdd->getParent());
+	  //recolor
 	  toAdd->getLeft()->setColor(false);
 	  toAdd->setColor(true);
 	}
       }
     }
+    //go to the next node in the tree
     else {
       add(toAdd, current->getRight());
     }
   }
+  //if the value is not greater than the current value
   else {
+    //and this is the right place to add the node
     if(current->getLeft() == NULL) {
+      //if the parent is black, just add the node
       if(black) {
 	current->setLeft(toAdd);
 	toAdd->setParent(current);
 	return;
       }
+      //otherwise
       else {
+	//add the node
 	toAdd->setParent(current);
 	current->setLeft(toAdd);
+	//if both the parent and the uncle are red, call the uncle function
 	if(current->getColor() == false && toAdd->getUncle()->getColor() == false) {
 	  uncle(toAdd);
+	  //if the top is red, make it black
 	  if(!top->getColor()) {
 	    top->setColor(true);
 	  }
 	}
-	if(current->getColor() == false && toAdd->getUncle()->getColor() == true) {
-	  
+	//if the parent is red and the uncle is black
+	if(current->getColor() == false && (toAdd->getUncle() == NULL || toAdd->getUncle()->getColor() == true)) {
+	  if(current->getParent()->getLeft() == current) {
+	    //do a right rotation with the parent and grandparent
+	    rightRT(current,current->getParent());
+	    //recolor
+	    current->getRight()->setColor(false);
+	    current->setColor(true);
+	  }
+	  else {
+	    //do a left rotation with the added and parent
+	    leftRT(toAdd,current);
+	    //do a left rotation with teh added value which is now the parent of the former parent, and the current parent of the added value
+	    rightRT(toAdd, toAdd->getParent());
+	    //recolor
+	    toAdd->getRight()->setColor(false);
+	    toAdd->setColor(true);
+	  }
 	}
       }
     }
@@ -201,6 +239,17 @@ void uncle(Node* current) {
 
 
 void RBtree::leftRT(Node* lower, Node* upper) {
+  int left;
+  Node* upParent = upper->getParent();
+  if(upper->getParent() == NULL) {
+    left = 0;
+  }
+  else if(upper->getParent()->getLeft() == upper) {
+    left = 1;
+  }
+  else {
+    left = 2;
+  }
   lower->setParent(upper->getParent());
   if(upper == top) {
     top = lower;
@@ -211,9 +260,26 @@ void RBtree::leftRT(Node* lower, Node* upper) {
   }
   lower->setLeft(upper);
   upper->setParent(lower);
+  if(left == 1) {
+    upParent->setLeft(lower);
+  }
+  else if(left == 2) {
+    upParent->setRight(lower);
+  }
 }
 
 void RBtree::rightRT(Node* lower, Node* upper) {
+  int left;
+  Node* upParent = upper->getParent();
+  if(upParent == NULL) {
+    left = 0;
+  }
+  else if(upParent->getLeft() == upper) {
+    left = 1;
+  }
+  else {
+    left = 2;
+  }
   lower->setParent(upper->getParent());
   if(upper == top) {
     top = lower;
@@ -224,4 +290,10 @@ void RBtree::rightRT(Node* lower, Node* upper) {
   }
   lower->setRight(upper);
   upper->setParent(lower);
+  if(left == 1) {
+    upParent->setLeft(lower);
+  }
+  else if(left == 2) {
+    upParent->setRight(lower);
+  }
 }
