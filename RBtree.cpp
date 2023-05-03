@@ -1,6 +1,6 @@
 #include "RBtree.h"
 
-void uncle(Node* current);
+//void uncle(Node* current);
 //void leftRT(Node* lower, Node* upper);
 //void rightRT(Node* lower, Node* upper);
 
@@ -36,8 +36,8 @@ void RBtree::print(Node* nTop, int depth) {
   }
 
   //if the left isn't NULL, do this function for the left
-  if(nTop->getLeft() != NULL) {
-    print(nTop->getLeft(), depth + 1);
+  if(nTop->getRight() != NULL) {
+    print(nTop->getRight(), depth + 1);
   }
 
   //print out the appropriate amount of spaces
@@ -47,15 +47,15 @@ void RBtree::print(Node* nTop, int depth) {
   //output the data
   cout << nTop->getData();
   if(nTop->getColor()) {
-    cout << "B" << endl;
+    cout << " (B)" << endl;
   }
   else {
-    cout << "R" << endl;
+    cout << " (R)" << endl;
   }
 
   //if the right isn't NULL, do this function for the right
-  if(nTop->getRight() != NULL) {
-    print(nTop->getRight(), depth + 1);
+  if(nTop->getLeft() != NULL) {
+    print(nTop->getLeft(), depth + 1);
   }
 }
 
@@ -139,7 +139,7 @@ void RBtree::add(Node* toAdd, Node* current) {
 	current->setRight(toAdd);
 	//if both the parent and uncle are black, call the uncle function, and if the top is red, make the top black
 	if(current->getColor() == false && toAdd->getUncle() != NULL && toAdd->getUncle()->getColor() == false) {
-	  uncle(toAdd);
+	  unclefix(toAdd);
 	  if(!top->getColor()) {
 	    top->setColor(true);
 	  }
@@ -154,10 +154,10 @@ void RBtree::add(Node* toAdd, Node* current) {
 	}
 	//if the parent is red and the uncle is black, and the parent is the left child of the grandparent (the added node is the right child of the parent)
 	else if(current->getColor() == false && (toAdd->getUncle() == NULL || toAdd->getUncle()->getColor() == true) && current->getParent()->getLeft() == current) {
-	  //right rotate the added value and the parent, and do the same thing as the previous case
-	  rightRT(toAdd, current);
-	  //the added value is now the parent, to left rotate the added value
-	  leftRT(toAdd,toAdd->getParent());
+	  //left rotate the added value and the parent, and do the same thing as the previous case
+	  leftRT(toAdd, current);
+	  //right rotate the added value is now the parent, to right rotate the added value
+	  rightRT(toAdd,toAdd->getParent());
 	  //recolor
 	  toAdd->getLeft()->setColor(false);
 	  toAdd->setColor(true);
@@ -185,8 +185,8 @@ void RBtree::add(Node* toAdd, Node* current) {
 	toAdd->setParent(current);
 	current->setLeft(toAdd);
 	//if both the parent and the uncle are red, call the uncle function
-	if(current->getColor() == false && toAdd->getUncle()->getColor() == false) {
-	  uncle(toAdd);
+	if(current->getColor() == false && toAdd->getUncle() != NULL && toAdd->getUncle()->getColor() == false) {
+	  unclefix(toAdd);
 	  //if the top is red, make it black
 	  if(!top->getColor()) {
 	    top->setColor(true);
@@ -219,21 +219,52 @@ void RBtree::add(Node* toAdd, Node* current) {
   }
 }
 
-void uncle(Node* current) {
-  Node* nParent = current->getParent();
-  Node* nUncle = current->getUncle();
-  if(nParent != NULL) {
-    nParent->setColor(true);
-  }
-  else {
+void RBtree::unclefix(Node* current) {
+  if(current == top) {
     return;
   }
-  if(nUncle != NULL) {
-    nUncle->setColor(true);
+  Node* nParent = current->getParent();
+  Node* nUncle = current->getUncle();
+  //if the uncle is black
+  if(nUncle == NULL || nUncle->getColor()) {
+    //and the parent and grandparent aren't null
+    if(nParent != NULL && nParent->getParent() != NULL) {
+      //if the parent is the left
+      if(nParent->getParent()->getLeft() == nParent) {
+	if(nParent->getLeft() == current) {
+	  rightRT(nParent, nParent->getParent());
+	}
+	else {
+	  leftRT(current,nParent);
+	  rightRT(current,current->getParent());
+	}
+      }
+      //if the parent is the right child
+      else {
+	if(nParent->getRight() == current) {
+	  leftRT(nParent, nParent->getParent());
+	}
+	else {
+	  rightRT(current, nParent);
+	  leftRT(current, current->getParent());
+	}
+      }
+    }
+  }
+  else {
+    if(nParent != NULL) {
+      nParent->setColor(true);
+    }
+    else {
+      return;
+    }
+    if(nUncle != NULL) {
+      nUncle->setColor(true);
+    }
   }
   if(current->getGP() != NULL) {
     nParent->getParent()->setColor(false);
-    uncle(current->getGP());
+    unclefix(current->getGP());
   }
 }
 

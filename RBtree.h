@@ -16,6 +16,7 @@ class RBtree {
   Node* setTop();
   void leftRT(Node* lower, Node* upper);
   void rightRT(Node* lower, Node* upper);
+  void unclefix(Node* current);
  private:
   Node* top;
 };
