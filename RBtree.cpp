@@ -1,5 +1,5 @@
 #include "RBtree.h"
-/* Name: Ishaan Varma
+ /* Name: Ishaan Varma
 Date: 5/5/2023
 Purpose: to implement the red black tree functions
  */
@@ -347,5 +347,34 @@ void RBtree::rightRT(Node* lower, Node* upper) {
   }
   else if(left == 2) {
     upParent->setRight(lower);
+  }
+}
+
+
+bool RBtree::search(int data) {
+  return search(data, top);
+}
+
+bool RBtree::search(int data, Node* current) {
+  if(current->getData() == data) {
+    return true;
+  }
+  else {
+    if(data < current->getData()) {
+      if(current->getLeft() == NULL) {
+	return false;
+      }
+      else {
+	return search(data, current->getLeft());
+      }
+    }
+    else {
+      if(current->getRight() == NULL) {
+	return false;
+      }
+      else {
+	return search(data,current->getRight());
+      }
+    }
   }
 }

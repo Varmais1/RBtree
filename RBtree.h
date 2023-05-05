@@ -11,7 +11,8 @@ class RBtree {
   void print(Node* nTop, int depth);
   void rebalance();
   void deleter();
-  bool search();
+  bool search(int data);
+  bool search(int data, Node* current);
   Node* getTop();
   Node* setTop();
   void leftRT(Node* lower, Node* upper);
