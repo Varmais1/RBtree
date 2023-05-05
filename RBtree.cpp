@@ -1,4 +1,8 @@
 #include "RBtree.h"
+/* Name: Ishaan Varma
+Date: 5/5/2023
+Purpose: to implement the red black tree functions
+ */
 
 //void uncle(Node* current);
 //void leftRT(Node* lower, Node* upper);
@@ -42,7 +46,7 @@ void RBtree::print(Node* nTop, int depth) {
 
   //print out the appropriate amount of spaces
   for(int i = 0; i < depth; i++) {
-    cout << "\t";
+    cout << "\t\t";
   }
   //output the data
   cout << nTop->getData();
@@ -114,6 +118,7 @@ Node* RBtree::getTop() {
 }*/
 
 void RBtree::add(Node* toAdd, Node* current) {
+  //if the tree is empty, put the node into the top *tested
   if(top==NULL) {
     top = toAdd;
     toAdd->setColor(true);
@@ -125,7 +130,7 @@ void RBtree::add(Node* toAdd, Node* current) {
   if(greater) {
     //if this is the place to insert
     if(current->getRight() == NULL) {
-      //if the parent is black
+      //if the parent is black *tested
       if(black) {
 	//just add the node
 	current->setRight(toAdd);
@@ -137,7 +142,7 @@ void RBtree::add(Node* toAdd, Node* current) {
 	//add the node
 	toAdd->setParent(current);
 	current->setRight(toAdd);
-	//if both the parent and uncle are black, call the uncle function, and if the top is red, make the top black
+	//if both the parent and uncle are red, call the uncle function, and if the top is red, make the top black *
 	if(current->getColor() == false && toAdd->getUncle() != NULL && toAdd->getUncle()->getColor() == false) {
 	  unclefix(toAdd);
 	  if(!top->getColor()) {
@@ -152,7 +157,7 @@ void RBtree::add(Node* toAdd, Node* current) {
 	  current->getLeft()->setColor(false);
 	  current->setColor(true);
 	}
-	//if the parent is red and the uncle is black, and the parent is the left child of the grandparent (the added node is the right child of the parent)
+	//if the parent is red and the uncle is black, and the parent is the left child of the grandparent (the added node is the right child of the parent) *tested
 	else if(current->getColor() == false && (toAdd->getUncle() == NULL || toAdd->getUncle()->getColor() == true) && current->getParent()->getLeft() == current) {
 	  //left rotate the added value and the parent, and do the same thing as the previous case
 	  leftRT(toAdd, current);
@@ -194,6 +199,7 @@ void RBtree::add(Node* toAdd, Node* current) {
 	}
 	//if the parent is red and the uncle is black
 	if(current->getColor() == false && (toAdd->getUncle() == NULL || toAdd->getUncle()->getColor() == true)) {
+	  //if the parent is the left child of the grandparent *tested
 	  if(current->getParent()->getLeft() == current) {
 	    //do a right rotation with the parent and grandparent
 	    rightRT(current,current->getParent());
@@ -202,10 +208,10 @@ void RBtree::add(Node* toAdd, Node* current) {
 	    current->setColor(true);
 	  }
 	  else {
-	    //do a left rotation with the added and parent
-	    leftRT(toAdd,current);
+	    //do a right rotation with the added and parent
+	    rightRT(toAdd,current);
 	    //do a left rotation with teh added value which is now the parent of the former parent, and the current parent of the added value
-	    rightRT(toAdd, toAdd->getParent());
+	    leftRT(toAdd, toAdd->getParent());
 	    //recolor
 	    toAdd->getRight()->setColor(false);
 	    toAdd->setColor(true);
@@ -225,27 +231,42 @@ void RBtree::unclefix(Node* current) {
   }
   Node* nParent = current->getParent();
   Node* nUncle = current->getUncle();
+  if(nParent->getColor()) {
+    return;
+  }
   //if the uncle is black
   if(nUncle == NULL || nUncle->getColor()) {
     //and the parent and grandparent aren't null
     if(nParent != NULL && nParent->getParent() != NULL) {
-      //if the parent is the left
+      //if the parent is the left *tested
       if(nParent->getParent()->getLeft() == nParent) {
+	//and the child is the right, then right rotate the parent and the grandparent *tested
 	if(nParent->getLeft() == current) {
+	  nParent->setColor(true);
+	  nParent->getParent()->setColor(false);
 	  rightRT(nParent, nParent->getParent());
 	}
+	//otherwise, left rotate the current and the parent, then right rotate the child and the parent *tested
 	else {
 	  leftRT(current,nParent);
+	  nParent->setColor(true);
+	  nParent->getParent()->setColor(false);
 	  rightRT(current,current->getParent());
 	}
       }
       //if the parent is the right child
       else {
+	//if current is the right child of the current, the left rotate the parent and the grandparent *tested
 	if(nParent->getRight() == current) {
+	  nParent->setColor(true);
+	  nParent->getParent()->setColor(false);
 	  leftRT(nParent, nParent->getParent());
 	}
+	//otherwise, right rotate the current and the parent first, then left rotate current and current's current parent, which was previously the grandparent *tested
 	else {
 	  rightRT(current, nParent);
+	  current->setColor(true);
+	  current->getParent()->setColor(false);
 	  leftRT(current, current->getParent());
 	}
       }

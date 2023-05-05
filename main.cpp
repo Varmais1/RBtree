@@ -3,6 +3,12 @@
 #include "RBtree.h"
 #include <fstream>
 
+/* Name: Ishaan Varma
+Date: 5/5/2023
+Purpose: main file where the commands are taken in.
+
+ */
+
 void singlelowercase(char sentence[]);
 
 
