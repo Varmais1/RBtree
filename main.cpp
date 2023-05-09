@@ -20,7 +20,7 @@ int main() {
   int num;
   char fileName[100];
   while(true) {
-    cout << "Type in quit, add or print, or file(for adding with a file)." << endl;
+    cout << "Type in quit, add or print, delete, search or file(for adding with a file)." << endl;
     cin >> command;
     singlelowercase(command);
     if(strcmp(command, "quit") == 0) {
@@ -47,6 +47,21 @@ int main() {
       while(finput >> add) {
 	tree.add(new Node(add), tree.getTop());
       }
+    }
+    else if(strcmp(command, "search") == 0) {
+      cout << "Which number do you wish to find?" << endl;
+      cin >> num;
+      if(tree.search(num)) {
+	cout << "The tree contains that number." << endl;
+      }
+      else {
+	cout << "No number in the tree." << endl;
+      }
+    }
+    else if(strcmp(command, "delete") == 0) {
+      cout << "Which number do you wish to delete?" << endl;
+      cin >> num;
+      tree.deletion(num, tree.getTop());
     }
   
   }

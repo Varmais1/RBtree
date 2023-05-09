@@ -67,55 +67,7 @@ Node* RBtree::getTop() {
   return top;
 }
 
-/*void RBtree::add(Node* toAdd, Node* current) {
-  if(top == NULL) {
-    top = toAdd;
-    toAdd->setColor(true);
-    return;
-  }
-  bool greater = toAdd->getData() > current->getData();
-  if(greater) {
-    if(current->getRight() == NULL) {
-      if(current->getColor()) {
-	current->setRight(toAdd);
-	toAdd->setParent(current);
-	return;
-      }
-      else {
-	current->setRight(toAdd);
-	toAdd->setParent(current);
-	if(!toAdd->getUncle()->getColor()) {
-	  uncle(toAdd);
-	  top->setColor(true);
-	}
-      }
-    }
-    else {
-      add(toAdd, current->getRight());
-    }
-  }
-  else {
-    if(current->getLeft() == NULL) {
-      if(current->getColor()) {
-	current->setLeft(toAdd);
-	toAdd->setParent(current);
-	return;
-      }
-      else {
-	current->setRight(toAdd);
-	toAdd->setParent(current);
-	if(!toAdd->getUncle()->getColor()) {
-	  uncle(toAdd);
-	  top->setColor(true);
-	}
-      }
-    }
-    else {
-      add(toAdd, current->getLeft());
-    }
-  }
-  
-}*/
+
 
 void RBtree::add(Node* toAdd, Node* current) {
   //if the tree is empty, put the node into the top *tested
@@ -376,5 +328,79 @@ bool RBtree::search(int data, Node* current) {
 	return search(data,current->getRight());
       }
     }
+  }
+}
+
+void RBtree::deletion(int data, Node* current) {
+  bool isTop = top == current;
+  if(current->getData() == data) {
+    //no child
+    if(current->getLeft() == NULL && current->getRight() == NULL) {
+      if(current->getColor()) {
+
+      }
+      else {
+	if(current->getParent()->getRight() == current) {
+	  current->getParent()->setRight(NULL);
+	}
+	//if the node to be deleted has no children and is red, just set the parents pointer to the child to NULL, and delete the node *tested
+	else {
+	  current->getParent()->setLeft(NULL);
+	}
+      }
+      delete current;
+    }
+    //has a right child but not a left child
+    else if(current->getRight() != NULL && current->getLeft() == NULL) {
+      if(current->getColor()) {
+
+      }
+      else {
+	current->getRight()->setParent(current->getParent());
+	if(isTop) {
+
+	}
+	else {
+	  if(current->getParent()->getRight() == current) {
+	    current->getParent()->setRight(current->getRight());
+	  }
+	  else {
+	    current->getParent()->setLeft(current->getLeft());
+	  }
+	  delete current;
+	}
+      }
+    }
+    //has a left child but not a right child
+    else if(current->getLeft() != NULL && current->getRight() == NULL) {
+      if(current->getColor()) {
+
+      }
+      else {
+
+	if(isTop) {
+
+	}
+	else {
+	  current->getLeft()->setParent(current->getParent());
+	  if(current->getParent()->getRight() == current) {
+	    current->getParent()->setRight(current->getLeft());
+	  }
+	  else {
+	    current->getParent()->setLeft(current->getLeft());
+	  }
+	}
+      }
+    }
+    //has 2 children
+    else {
+
+    }
+  }
+  else if(current->getData() > data) {
+    deletion(data, current->getLeft());
+  }
+  else {
+    deletion(data, current->getRight());
   }
 }

@@ -10,7 +10,7 @@ class RBtree {
   void add(Node* toAdd, Node* current);
   void print(Node* nTop, int depth);
   void rebalance();
-  void deleter();
+  void deletion(int data, Node* current);
   bool search(int data);
   bool search(int data, Node* current);
   Node* getTop();
