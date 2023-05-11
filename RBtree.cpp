@@ -116,7 +116,7 @@ void RBtree::add(Node* toAdd, Node* current) {
 	  //right rotate the added value is now the parent, to right rotate the added value
 	  rightRT(toAdd,toAdd->getParent());
 	  //recolor
-	  toAdd->getLeft()->setColor(false);
+	  toAdd->getRight()->setColor(false);
 	  toAdd->setColor(true);
 	}
       }
@@ -165,7 +165,7 @@ void RBtree::add(Node* toAdd, Node* current) {
 	    //do a left rotation with teh added value which is now the parent of the former parent, and the current parent of the added value
 	    leftRT(toAdd, toAdd->getParent());
 	    //recolor
-	    toAdd->getRight()->setColor(false);
+	    toAdd->getLeft()->setColor(false);
 	    toAdd->setColor(true);
 	  }
 	}
@@ -183,7 +183,7 @@ void RBtree::unclefix(Node* current) {
   }
   Node* nParent = current->getParent();
   Node* nUncle = current->getUncle();
-  if(nParent->getColor()) {
+  if(nParent == NULL || nParent->getColor()) {
     return;
   }
   //if the uncle is black
@@ -192,13 +192,13 @@ void RBtree::unclefix(Node* current) {
     if(nParent != NULL && nParent->getParent() != NULL) {
       //if the parent is the left *tested
       if(nParent->getParent()->getLeft() == nParent) {
-	//and the child is the right, then right rotate the parent and the grandparent *tested
+	//and the child is the left, then right rotate the parent and the grandparent *tested 2
 	if(nParent->getLeft() == current) {
 	  nParent->setColor(true);
 	  nParent->getParent()->setColor(false);
 	  rightRT(nParent, nParent->getParent());
 	}
-	//otherwise, left rotate the current and the parent, then right rotate the child and the parent *tested
+	//otherwise, left rotate the current and the parent, then right rotate the child and the parent *tested 2
 	else {
 	  leftRT(current,nParent);
 	  nParent->setColor(true);
@@ -214,7 +214,7 @@ void RBtree::unclefix(Node* current) {
 	  nParent->getParent()->setColor(false);
 	  leftRT(nParent, nParent->getParent());
 	}
-	//otherwise, right rotate the current and the parent first, then left rotate current and current's current parent, which was previously the grandparent *tested
+	//otherwise, right rotate the current and the parent first, then left rotate current and current's current parent, which was previously the grandparent *tested 2
 	else {
 	  rightRT(current, nParent);
 	  current->setColor(true);
