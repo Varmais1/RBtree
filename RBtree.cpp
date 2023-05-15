@@ -76,6 +76,15 @@ void RBtree::add(Node* toAdd, Node* current) {
     toAdd->setColor(true);
     return;
   }
+  /*  cout << "Address:" << toAdd << " Value to be Added: " << toAdd->getData();
+  cout << "Current left: " << current->getLeft() << endl;
+  if(current->getLeft() != NULL) {
+    cout << " Data: " << current->getLeft()->getData() << endl;
+  }
+  cout << "Current right: " << current->getRight() << endl;
+  if(current->getRight() != NULL) {
+    cout << " Data: " << current->getRight()->getData() << endl;
+    }*/
   bool greater = toAdd->getData() >= current->getData();
   bool black = current->getColor();
   //if greater
