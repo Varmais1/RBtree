@@ -61,6 +61,7 @@ int main() {
     else if(strcmp(command, "delete") == 0) {
       cout << "Which number do you wish to delete?" << endl;
       cin >> num;
+      bool test = true;
       tree.deletion(num, tree.getTop());
     }
   

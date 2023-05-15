@@ -345,8 +345,13 @@ void RBtree::deletion(int data, Node* current) {
   if(current->getData() == data) {
     //no child
     if(current->getLeft() == NULL && current->getRight() == NULL) {
+      if(isTop) {
+	top = NULL;
+	delete current;
+	return;
+      }
       if(current->getColor()) {
-
+	
       }
       else {
 	if(current->getParent()->getRight() == current) {
@@ -361,13 +366,46 @@ void RBtree::deletion(int data, Node* current) {
     }
     //has a right child but not a left child
     else if(current->getRight() != NULL && current->getLeft() == NULL) {
+      //and is black
       if(current->getColor()) {
-
+	//and the child is red, set the parent of right to current's right, and put current's right in current's place, then delete current
+	if(!current->getRight()->getColor()) {
+	  current->getRight()->setParent(current->getParent());
+	  if(current->getParent() != NULL) {
+	    if(current->getParent()->getRight() == current) {
+	      current->getParent()->setRight(current->getRight());
+	    }
+	    else {
+	      current->getParent()->setLeft(current->getLeft());
+	    }
+	  }
+	  current->getRight()->setColor(true);
+	  if(isTop) {
+	    top = current->getRight();
+	  }
+	  delete current;
+	}
+	else {
+	  //case 1, if current is the top
+	  if(isTop) {
+	    top = current->getRight();
+	    current->getRight()->setParent(NULL);
+	    delete current;
+	    return;
+	  }
+	  //all other cases
+	  else {
+	    delete current;
+	    
+	  }
+	}
       }
+      //and is red
       else {
 	current->getRight()->setParent(current->getParent());
 	if(isTop) {
-
+	  top = current->getRight();
+	  delete current;
 	}
 	else {
 	  if(current->getParent()->getRight() == current) {
@@ -382,13 +420,40 @@ void RBtree::deletion(int data, Node* current) {
     }
     //has a left child but not a right child
     else if(current->getLeft() != NULL && current->getRight() == NULL) {
+      //and current is black
       if(current->getColor()) {
-
+	//and the child is red, set the child's parent to current's parent, and replace current with the child
+	if(!current->getLeft()->getColor()) {
+	  current->getLeft()->setParent(current->getParent());
+	  if(current->getParent() != NULL) {
+	    if(current->getParent()->getRight() == current) {
+	      current->getParent()->setRight(current->getLeft());
+	    }
+	    else {
+	      current->getParent()->setLeft(current->getLeft());
+	    }
+	  }
+	  current->getLeft()->setColor(true);
+	  if(isTop) {
+	    top = current->getRight();
+	  }
+	  delete current;
+	}
+	else {
+	  //case 1, if current is the top
+	  if(isTop) {
+	    top = current->getLeft();
+	    current->getLeft()->setParent(NULL);
+	    delete current;
+	    return;
+	  }
+	}
       }
+      //and current is red
       else {
-
 	if(isTop) {
-
+	  top = current->getLeft();
+	  delete current;
 	}
 	else {
 	  current->getLeft()->setParent(current->getParent());
@@ -403,7 +468,12 @@ void RBtree::deletion(int data, Node* current) {
     }
     //has 2 children
     else {
-
+      Node* itr = current->getLeft();
+      while(current->getRight() != NULL) {
+	itr = itr->getRight();
+      }
+      current->setData(itr->getData());
+      deletion(itr->getData(), itr);
     }
   }
   else if(current->getData() > data) {
