@@ -1,13 +1,8 @@
 #include "RBtree.h"
  /* Name: Ishaan Varma
-Date: 5/5/2023
+Date: 5/19/2023
 Purpose: to implement the red black tree functions
- */
-
-//void uncle(Node* current);
-//void leftRT(Node* lower, Node* upper);
-//void rightRT(Node* lower, Node* upper);
-
+*/
 using namespace std;
 
 RBtree::RBtree() {
@@ -385,17 +380,35 @@ void RBtree::deletion(int data, Node* current) {
 	  }
 	  delete current;
 	}
+	
+	//if the child is black
 	else {
 	  //case 1, if current is the top
 	  if(isTop) {
 	    top = current->getRight();
 	    current->getRight()->setParent(NULL);
+	    top->setColor(true);
 	    delete current;
 	    return;
 	  }
 	  //all other cases
 	  else {
+	    //set up the double black
+	    Node* actual = current->getRight();
+	    bool rightParent = current->getParent()->getRight() == current;
+	    Node* sibling = NULL;
+	    if(rightParent) {
+	      current->getParent()->setRight(current->getRight());
+	      current->getRight()->setParent(current->getParent());
+	      sibling = current->getParent()->getLeft();
+	    }
+	    else {
+	      current->getParent()->setLeft(current->getRight());
+	      current->getRight()->setParent(current->getParent());
+	      sibling = current->getParent()->getRight();
+	    }
 	    delete current;
+	    doubleBlackFix(actual, actual->getParent(), sibling, rightParent);
 	    
 	  }
 	}
@@ -405,6 +418,7 @@ void RBtree::deletion(int data, Node* current) {
 	current->getRight()->setParent(current->getParent());
 	if(isTop) {
 	  top = current->getRight();
+	  current->getRight()->setColor(true);
 	  delete current;
 	}
 	else {
@@ -447,6 +461,10 @@ void RBtree::deletion(int data, Node* current) {
 	    delete current;
 	    return;
 	  }
+	  //all other cases
+	  else {
+	    
+	  }
 	}
       }
       //and current is red
@@ -483,3 +501,160 @@ void RBtree::deletion(int data, Node* current) {
     deletion(data, current->getRight());
   }
 }
+
+
+
+void RBtree::doubleBlackFix(Node* u, Node* sparent, Node* sibling, bool rightParent) {
+  if(u != NULL && u == top) {
+    u->setColor(true);
+    return;
+  }
+  //if the double black node is the right child of the parent
+  if(rightParent) {
+    //the sibling is the left child
+    //if the sibling isn't null
+    if(sibling != NULL) {
+      //and the sibling is black
+      if(sibling->getColor()) {
+	//if the left child of sibling is red, do the left left case
+	if(sibling->getLeft() != NULL && !sibling->getLeft()->getColor()) {
+	  //right rotate the sibling and the parent
+	  rightRT(sibling, sparent);
+	}
+	//if the right child of sibling is red and the left child isn't, do the left right case
+	else if(sibling->getRight() != NULL && !sibling->getRight()->getColor()) {
+	  //left rotate the siblign and the child
+	  leftRT(sibling->getRight(), sibling);
+	  //recolor
+	  sibling->getParent()->setColor(true);
+	  sibling->setColor(false);
+	  //rotate the child, which is now sibling's parent, and siblings old parent.
+	  rightRT(sibling->getParent(), sparent);
+	}
+	//both
+	else {
+	  sibling->setColor(false);
+	  Node* nParent = sparent->getParent();
+	  bool rightchild = true;
+	  Node* nsibling = NULL;
+	  if(nParent != NULL) {
+	    rightchild = nParent->getRight() == sparent;
+	    if(rightchild) {
+	      nsibling = nParent->getLeft();
+	    }
+	    else {
+	     nsibling = nParent->getRight();
+	    }
+	  }
+	  if(sparent->getColor()) {
+	    doubleBlackFix(sparent, nParent, nsibling, rightchild);
+	  }
+	  else {
+	    sparent->setColor(true);
+	    return;
+	  }
+	}
+      }
+      //the sibling is red
+      else {
+	sparent->setColor(false);
+	sibling->setColor(true);
+	rightRT(sibling, sparent);
+	bool rightchild = sparent->getRight() == u;
+	Node* nsibling = NULL;
+	if(rightchild) {
+	  nsibling = sparent->getLeft();
+	}
+	else {
+	  nsibling = sparent->getRight();
+	}
+	if(nsibling != NULL) {
+	  nsibling->setColor(false);
+	}
+	if(sparent->getColor()) {
+	  doubleBlackFix(sparent, sparent->getParent(), sparent->getParent()->getRight(), true);
+	}
+	else {
+	  sparent->setColor(true);
+	}
+      }
+    }
+    else {
+      return;
+    }
+  }
+  //if the double black node is the left child of the parent
+  else {
+    //the sibling is the right child
+    //if the sibling isn't null
+    if(sibling != NULL) {
+      //and the sibling is black
+      if(sibling->getColor()) {
+	//if siblings right child is red, do the right right case
+	if(sibling->getRight() != NULL && !sibling->getRight()->getColor()) {
+	  //left rotate the parent and sibling
+	  leftRT(sibling, sparent);
+	}
+	//if sibling left child is red and the right child isn't, do the left left case
+	else if(sibling->getLeft() != NULL && !sibling->getLeft()) {
+	  //right rotate the sibling
+	  rightRT(sibling->getLeft(), sibling);
+	  //recolor
+	  sibling->getParent()->setColor(true);
+	  sibling->setColor(false);
+	  //left rotate sibling previous child, which is now its parent due to the previous right rotation, with sparent
+	  leftRT(sibling->getParent(), sparent);
+	}
+	//do a different case
+	else {
+	  sibling->setColor(false);
+	  Node* nParent = sparent->getParent();
+	  bool rightchild = true;
+	  Node* nsibling = NULL;
+	  if(nParent!= NULL) {
+	    rightchild = nParent->getRight() == sparent;
+	    if(rightchild) {
+	      nsibling = nParent->getLeft();
+	    }
+	    else {
+	      nsibling = nParent->getRight();
+	    }
+	  }
+	  if(sparent->getColor()) {
+	    doubleBlackFix(sparent, nParent, nsibling, rightchild);
+	  }
+	  else {
+	    sparent->setColor(true);
+	  }
+	}
+      }
+      //the sibling is red
+      else {
+	sparent->setColor(false);
+	sibling->setColor(true);
+	leftRT(sibling, sparent);
+	bool rightchild = sparent->getRight() == u;
+	Node* nsibling = NULL;
+	if(rightchild) {
+	  nsibling = sparent->getLeft();
+	}
+	else {
+	  nsibling = sparent->getRight();
+	}
+	if(nsibling != NULL) {
+	  nsibling->setColor(false);
+	}
+	if(sparent->getColor()) {
+	  doubleBlackFix(sparent, sparent->getParent(), sparent->getParent()->getRight(), false);
+	}
+	else {
+	  sparent->setColor(true);
+	}
+      }
+    }
+    //if the sibling is null
+    else {
+      return;
+    }
+  }
+  }
