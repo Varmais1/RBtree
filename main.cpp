@@ -63,6 +63,7 @@ int main() {
       cin >> num;
       bool test = true;
       tree.deletion(num, tree.getTop());
+      test = true;
     }
   
   }

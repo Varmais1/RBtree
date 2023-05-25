@@ -346,7 +346,32 @@ void RBtree::deletion(int data, Node* current) {
 	return;
       }
       if(current->getColor()) {
-	
+	if(!current->getParent()->getColor()) {
+	  current->getParent()->setColor(true);
+	  bool rightChild = current->getParent()->getRight() == current;
+	  if(rightChild) {
+	    current->getParent()->setRight(NULL);
+	  }
+	  else {
+	    current->getParent()->setLeft(NULL);
+	  }
+	  return;
+	}
+	else {
+	  Node* parent = current->getParent();
+	  bool rightChild = current->getParent()->getRight() == current;
+	  Node* sibling = NULL;
+	  if(rightChild) {
+	    parent->setRight(NULL);
+	    sibling = parent->getLeft();
+	  }
+	  else {
+	    parent->setLeft(NULL);
+	    sibling = parent->getRight();
+	  }
+	  delete current;
+	  doubleBlackFix(NULL, parent, sibling, rightChild);
+	}
       }
       else {
 	if(current->getParent()->getRight() == current) {
@@ -463,7 +488,22 @@ void RBtree::deletion(int data, Node* current) {
 	  }
 	  //all other cases
 	  else {
-	    
+	    //set up the double black
+	    Node* actual = current->getLeft();
+	    bool rightParent = current->getParent()->getRight() == current;
+	    Node* sibling = NULL;
+	    if(rightParent) {
+	      current->getParent()->setRight(current->getLeft());
+	      current->getLeft()->setParent(current->getParent());
+	      sibling = current->getParent()->getLeft();
+	    }
+	    else {
+	      current->getParent()->setLeft(current->getLeft());
+	      current->getLeft()->setParent(current->getParent());
+	      sibling = current->getParent()->getRight();
+	    }
+	    delete current;
+	    doubleBlackFix(actual, actual->getParent(), sibling, rightParent);
 	  }
 	}
       }
@@ -633,19 +673,9 @@ void RBtree::doubleBlackFix(Node* u, Node* sparent, Node* sibling, bool rightPar
 	sparent->setColor(false);
 	sibling->setColor(true);
 	leftRT(sibling, sparent);
-	bool rightchild = sparent->getRight() == u;
-	Node* nsibling = NULL;
-	if(rightchild) {
-	  nsibling = sparent->getLeft();
-	}
-	else {
-	  nsibling = sparent->getRight();
-	}
-	if(nsibling != NULL) {
-	  nsibling->setColor(false);
-	}
+	bool rightchild = sibling->getRight() == sparent;
 	if(sparent->getColor()) {
-	  doubleBlackFix(sparent, sparent->getParent(), sparent->getParent()->getRight(), false);
+	  doubleBlackFix(sparent, sibling, sibling->getRight(), rightchild);
 	}
 	else {
 	  sparent->setColor(true);
@@ -657,4 +687,4 @@ void RBtree::doubleBlackFix(Node* u, Node* sparent, Node* sibling, bool rightPar
       return;
     }
   }
-  }
+}
