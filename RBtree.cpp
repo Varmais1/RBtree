@@ -526,12 +526,22 @@ void RBtree::deletion(int data, Node* current) {
     }
     //has 2 children
     else {
+      if(current->getLeft() != NULL) {
       Node* itr = current->getLeft();
-      while(current->getRight() != NULL) {
+      while(itr->getRight() != NULL) {
 	itr = itr->getRight();
       }
       current->setData(itr->getData());
       deletion(itr->getData(), itr);
+      }
+      else {
+	Node* itr = current->getRight();
+	while(itr->getLeft() != NULL) {
+	  itr = itr->getLeft();
+	}
+	current->setData(itr->getData());
+	deletion(itr->getData(), itr);
+      }
     }
   }
   else if(current->getData() > data) {
