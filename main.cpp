@@ -15,12 +15,12 @@ void singlelowercase(char sentence[]);
 using namespace std;
 
 int main() {
-  RBtree tree;
+  RBtree* tree = new RBtree();
   char command[10];
   int num;
   char fileName[100];
   while(true) {
-    cout << "Type in quit, add or print, delete, search or file(for adding with a file)." << endl;
+    cout << "Type in quit, add or print, delete, search, file(for adding with a file), or filedelete(for deleting with a file)." << endl;
     cin >> command;
     singlelowercase(command);
     if(strcmp(command, "quit") == 0) {
@@ -30,10 +30,10 @@ int main() {
       cout << "Which number would you like to add?" << endl;
       cin >> num;
       Node* addition = new Node(num);
-      tree.add(addition, tree.getTop());
+      tree->add(addition, tree->getTop());
     }
     else if(strcmp(command, "print") == 0) {
-      tree.print(tree.getTop(),0);
+      tree->print(tree->getTop(),0);
     }
     else if(strcmp(command, "file") == 0) {
       cout << "Give the file name here: " << endl;
@@ -45,13 +45,30 @@ int main() {
       }
       int add;
       while(finput >> add) {
-	tree.add(new Node(add), tree.getTop());
+	tree->add(new Node(add), tree->getTop());
+      }
+    }
+    else if(strcmp(command, "filedelete") == 0) {
+      cout << "Give the file name here: " << endl;
+      cin >> fileName;
+      ifstream finput(fileName);
+      if(!finput.good()) {
+	cout << "No file." << endl;
+	continue;
+      }
+      int add;
+      while(finput >> add) {
+	//cout << add << "e" << endl;
+	if(tree->getTop() != NULL) {
+	  tree->deletion(add, tree->getTop());
+	  //tree->print(tree->getTop(), 0);
+	}
       }
     }
     else if(strcmp(command, "search") == 0) {
       cout << "Which number do you wish to find?" << endl;
       cin >> num;
-      if(tree.search(num)) {
+      if(tree->search(num)) {
 	cout << "The tree contains that number." << endl;
       }
       else {
@@ -62,7 +79,7 @@ int main() {
       cout << "Which number do you wish to delete?" << endl;
       cin >> num;
       bool test = true;
-      tree.deletion(num, tree.getTop());
+      tree->deletion(num, tree->getTop());
       test = true;
     }
   

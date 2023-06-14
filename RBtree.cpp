@@ -381,8 +381,8 @@ void RBtree::deletion(int data, Node* current) {
 	else {
 	  current->getParent()->setLeft(NULL);
 	}
+	delete current;
       }
-      delete current;
     }
     //has a right child but not a left child
     else if(current->getRight() != NULL && current->getLeft() == NULL) {
